@@ -86,10 +86,8 @@ func (y *Yali) LoadAllMem() error {
 
 		wg.Add(1)
 		go func(class string, path string) {
-			if err := y.LoadModel(class, path, true); err != nil {
-				fmt.Printf("ERROR loading class %s :: %v\n", class, err)
-			} else {
-				fmt.Printf("loaded class %s from MEM path %s\n", class, path)
+			if err := y.loadModel(class, path, true); err != nil {
+				panic(fmt.Sprintf("ERROR loading class %s: %v\n", class, err))
 			}
 			wg.Done()
 		}(className, f)
@@ -118,7 +116,7 @@ func (y *Yali) LoadAllFS() error {
 
 		wg.Add(1)
 		go func() {
-			if err := y.LoadModel(className, path, false); err != nil {
+			if err := y.loadModel(className, path, false); err != nil {
 				fmt.Printf("ERROR loading class %s :: %v\n", className, err)
 			} else {
 				fmt.Printf("loaded class %s from path %s\n", className, path)
@@ -148,11 +146,11 @@ func (y *Yali) IdentifyString(data string) LangList {
 		}
 
 		for i := 0; i <= len(t)-y.Ngram; i++ {
-			length := y.Ngram + i
-			if i > len(t) || length > len(t) {
+			j := y.Ngram + i
+			if i >= len(t) || j > len(t) {
 				continue
 			}
-			w := t[i:length]
+			w := t[i:j]
 
 			if _, ok := y.Freq[w]; ok {
 				for lang, v := range y.Freq[w] {
@@ -187,7 +185,6 @@ func (y *Yali) IdentifyString(data string) LangList {
 	return SortLangs(res)
 }
 
-// recompute classes after manipulation with classes
 func (y *Yali) ComputeClasses() {
 
 	y.Mu.Lock()
@@ -202,7 +199,7 @@ func (y *Yali) ComputeClasses() {
 	return
 }
 
-func (y *Yali) LoadModel(class string, file string, fromMem bool) error {
+func (y *Yali) loadModel(class string, file string, fromMem bool) error {
 
 	y.Mu.Lock()
 	defer y.Mu.Unlock()
