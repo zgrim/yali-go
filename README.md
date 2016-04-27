@@ -1,6 +1,8 @@
-### YALI port http://search.cpan.org/perldoc?Lingua%3A%3AYALI%3A%3ALanguageIdentifier
+#### Lingua::YALI (Yet Another Language Identifier)
+#### ported from Perl 
+http://search.cpan.org/perldoc?Lingua%3A%3AYALI%3A%3ALanguageIdentifier
 
-### Lingua YALI (Yet Another Language Identifier)
+(expects use of go-bindata to embed the resources, otherwise is easily adapted for fs)
 
 ```sh
 cp /from/perl/src/share/*.gz data/
