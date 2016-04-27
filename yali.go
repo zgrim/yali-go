@@ -245,7 +245,8 @@ func (y *Yali) LoadModel(class string, file string, fromMem bool) error {
 
 	if ngram != y.Ngram {
 		return errors.New(
-			fmt.Sprintf("incompatible model for class %s: expected %d-grams, found %d-gram", class, y.Ngram, ngram))
+			fmt.Sprintf("incompatible model for class %s: expected %d-grams, found %d-gram",
+				class, y.Ngram, ngram))
 	}
 
 	var sum float32
@@ -295,30 +296,6 @@ func (y *Yali) LoadModel(class string, file string, fromMem bool) error {
 
 	y.ModelFile[class] = file
 	return nil
-}
-
-func (y *Yali) UnloadModel(class string) {
-
-	y.Mu.Lock()
-	defer y.Mu.Unlock()
-
-	if _, ok := y.ModelFile[class]; !ok {
-		return
-	}
-
-	y.Mu.Lock()
-	defer func() {
-		y.Mu.Unlock()
-		y.ComputeClasses()
-	}()
-
-	delete(y.ModelFile, class)
-
-	if len(y.Classes) == 0 {
-		y.Ngram = -1
-	}
-
-	return
 }
 
 func readGzData(path string) ([]byte, error) {
